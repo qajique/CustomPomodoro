@@ -7,8 +7,8 @@ class ViewController: UIViewController {
     var timer = Timer()
     var isWorkTime = true
     var isStarted = false
-    let workTimeDuration = 20
-    let restTimeDuration = 300
+    let workTimeDuration = 10
+    let restTimeDuration = 5
     var timerDuration = 10
 
     private lazy var button: UIButton = {
