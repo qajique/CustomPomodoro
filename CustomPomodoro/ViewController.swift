@@ -3,6 +3,8 @@ import UIKit
 class ViewController: UIViewController {
 
     let shapeLayer = CAShapeLayer()
+    let trackLayer = CAShapeLayer()
+    let circularPath = UIBezierPath(arcCenter: .zero, radius: Metric.circleRadius, startAngle: 0, endAngle: 2 * CGFloat.pi, clockwise: true)
     let basicAnimation = CABasicAnimation(keyPath: "strokeEnd")
     var timer = Timer()
     var isWorkTime = true
@@ -29,17 +31,25 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupHierarchy()
+        setupView()
+        setupLayout()
 
-        let trackLayer = CAShapeLayer()
-        let circularPath = UIBezierPath(arcCenter: .zero, radius: 100, startAngle: 0, endAngle: 2 * CGFloat.pi, clockwise: true)
+    }
 
+    private func setupHierarchy() {
+        view.layer.addSublayer(trackLayer)
+        view.layer.addSublayer(shapeLayer)
+        view.addSubview(label)
+        view.addSubview(button)
+    }
+
+    private func setupView() {
         trackLayer.path = circularPath.cgPath
         trackLayer.strokeColor = UIColor.lightGray.cgColor
         trackLayer.fillColor = UIColor.clear.cgColor
         trackLayer.lineWidth = 5
         trackLayer.position = view.center
-
-        view.layer.addSublayer(trackLayer)
 
         shapeLayer.path = circularPath.cgPath
         shapeLayer.fillColor = UIColor.clear.cgColor
@@ -49,21 +59,21 @@ class ViewController: UIViewController {
         shapeLayer.position = view.center
         shapeLayer.transform = CATransform3DMakeRotation(-CGFloat.pi / 2, 0, 0, 1)
 
-        view.layer.addSublayer(shapeLayer)
-
-        view.addSubview(label)
-        view.addSubview(button)
-
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+    }
+
+    private func setupLayout() {
 
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 150).isActive = true
-        button.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 18).isActive = true
-        button.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -18).isActive = true
+
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            button.topAnchor.constraint(equalTo: label.bottomAnchor, constant: Metric.buttonTopOffset),
+            button.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Metric.buttonLeftOffset),
+            button.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: Metric.buttonRightOffset)
+        ])
     }
 
     @objc private func buttonTapped() {
@@ -146,7 +156,6 @@ class ViewController: UIViewController {
         shapeLayer.beginTime = timeSincePause
         button.setImage(UIImage(named: "pauseIcon"), for: .normal)
         timer = Timer.scheduledTimer(timeInterval: 0.001, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
-        print(timer.timeInterval)
     }
 
     var counter = 0
@@ -174,6 +183,16 @@ class ViewController: UIViewController {
             }
             button.setImage(UIImage(named: "playIcon"), for: .normal)
         }
+    }
+}
+
+extension ViewController {
+
+    enum Metric {
+        static let circleRadius: CGFloat = 100
+        static let buttonTopOffset: CGFloat = 150
+        static let buttonLeftOffset: CGFloat = 18
+        static let buttonRightOffset: CGFloat = -18
     }
 }
 
