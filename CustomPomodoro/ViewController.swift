@@ -7,9 +7,10 @@ class ViewController: UIViewController {
     var timer = Timer()
     var isWorkTime = true
     var isStarted = false
-    let workTimeDuration = 10
-    let restTimeDuration = 5
-    var timerDuration = 10
+
+    let workTimeDuration: Double = 10
+    let restTimeDuration: Double = 5
+    var timerDuration: Double = 10
 
     private lazy var button: UIButton = {
         let button = UIButton()
@@ -29,14 +30,14 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let viewCenter = view.center
         let trackLayer = CAShapeLayer()
-        let circularPath = UIBezierPath(arcCenter: viewCenter, radius: 100, startAngle: -CGFloat.pi / 2, endAngle: 2 * CGFloat.pi, clockwise: true)
+        let circularPath = UIBezierPath(arcCenter: .zero, radius: 100, startAngle: 0, endAngle: 2 * CGFloat.pi, clockwise: true)
 
         trackLayer.path = circularPath.cgPath
         trackLayer.strokeColor = UIColor.lightGray.cgColor
         trackLayer.fillColor = UIColor.clear.cgColor
         trackLayer.lineWidth = 5
+        trackLayer.position = view.center
 
         view.layer.addSublayer(trackLayer)
 
@@ -45,6 +46,8 @@ class ViewController: UIViewController {
         shapeLayer.strokeEnd = 0
         shapeLayer.lineWidth = 8
         shapeLayer.lineCap = CAShapeLayerLineCap.round
+        shapeLayer.position = view.center
+        shapeLayer.transform = CATransform3DMakeRotation(-CGFloat.pi / 2, 0, 0, 1)
 
         view.layer.addSublayer(shapeLayer)
 
@@ -69,7 +72,7 @@ class ViewController: UIViewController {
 
         if !isStarted {
             chooseAnimation()
-            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+            timer = Timer.scheduledTimer(timeInterval: 0.001, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
             isStarted = true
         } else {
             if shapeLayer.speed > 0 {
@@ -80,10 +83,10 @@ class ViewController: UIViewController {
         }
     }
 
-    private func secondsToMinutesAndSeconds(_ seconds: Int) -> String {
+    private func secondsToMinutesAndSeconds(_ seconds: Double) -> String {
 
-        let minutesInt = (seconds / 60) % 60
-        let secondsInt = seconds % 60
+        let minutesInt = Int((seconds / 60).truncatingRemainder(dividingBy: 60))
+        let secondsInt = Int(seconds.truncatingRemainder(dividingBy: 60))
         var result = String(minutesInt) + ":"
 
         if minutesInt < 10 {
@@ -101,7 +104,7 @@ class ViewController: UIViewController {
 
     private func chooseAnimation() {
         basicAnimation.toValue = 1
-        basicAnimation.speed = 0.8
+        basicAnimation.speed = 1.0
         basicAnimation.fillMode = CAMediaTimingFillMode.forwards
         basicAnimation.isRemovedOnCompletion = false
         button.setImage(UIImage(named: "pauseIcon"), for: .normal)
@@ -128,6 +131,7 @@ class ViewController: UIViewController {
         timer.invalidate()
         shapeLayer.timeOffset = pausedTime
         button.setImage(UIImage(named: "playIcon"), for: .normal)
+
     }
 
     private func resumeAnimation() {
@@ -141,12 +145,19 @@ class ViewController: UIViewController {
 
         shapeLayer.beginTime = timeSincePause
         button.setImage(UIImage(named: "pauseIcon"), for: .normal)
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 0.001, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+        print(timer.timeInterval)
     }
 
-    @objc private func timerAction() {
+    var counter = 0
 
-        timerDuration -= 1
+    @objc private func timerAction() {
+        counter += 1
+
+        if counter == 1000 {
+                timerDuration -= 1
+                counter = 0
+        }
 
         if timerDuration >= 0 {
             label.text = secondsToMinutesAndSeconds(timerDuration)
