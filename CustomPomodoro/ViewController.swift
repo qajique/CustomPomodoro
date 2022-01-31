@@ -7,9 +7,9 @@ class ViewController: UIViewController {
     var timer = Timer()
     var isWorkTime = true
     var isStarted = false
-    let workTimeDuration = 10
-    let restTimeDuration = 5
-    var timerDuration = 10
+    let workTimeDuration: Double = 10
+    let restTimeDuration: Double = 5
+    var timerDuration: Double = 10
 
     private lazy var button: UIButton = {
         let button = UIButton()
@@ -71,7 +71,7 @@ class ViewController: UIViewController {
 
         if !isStarted {
             chooseAnimation()
-            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+            timer = Timer.scheduledTimer(timeInterval: 0.001, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
             isStarted = true
         } else {
             if shapeLayer.speed > 0 {
@@ -82,10 +82,10 @@ class ViewController: UIViewController {
         }
     }
 
-    private func secondsToMinutesAndSeconds(_ seconds: Int) -> String {
+    private func secondsToMinutesAndSeconds(_ seconds: Double) -> String {
 
-        let minutesInt = (seconds / 60) % 60
-        let secondsInt = seconds % 60
+        let minutesInt = Int((seconds / 60).truncatingRemainder(dividingBy: 60))
+        let secondsInt = Int(seconds.truncatingRemainder(dividingBy: 60))
         var result = String(minutesInt) + ":"
 
         if minutesInt < 10 {
@@ -130,6 +130,7 @@ class ViewController: UIViewController {
         timer.invalidate()
         shapeLayer.timeOffset = pausedTime
         button.setImage(UIImage(named: "playIcon"), for: .normal)
+
     }
 
     private func resumeAnimation() {
@@ -143,12 +144,19 @@ class ViewController: UIViewController {
 
         shapeLayer.beginTime = timeSincePause
         button.setImage(UIImage(named: "pauseIcon"), for: .normal)
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 0.001, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+        print(timer.timeInterval)
     }
 
-    @objc private func timerAction() {
+    var counter = 0
 
-        timerDuration -= 1
+    @objc private func timerAction() {
+        counter += 1
+
+        if counter == 1000 {
+                timerDuration -= 1
+                counter = 0
+        }
 
         if timerDuration >= 0 {
             label.text = secondsToMinutesAndSeconds(timerDuration)
