@@ -7,6 +7,7 @@ class ViewController: UIViewController {
     var timer = Timer()
     var isWorkTime = true
     var isStarted = false
+
     let workTimeDuration: Double = 10
     let restTimeDuration: Double = 5
     var timerDuration: Double = 10
