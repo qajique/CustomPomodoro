@@ -7,8 +7,8 @@ class ViewController: UIViewController {
     var timer = Timer()
     var isWorkTime = true
     var isStarted = false
-    let workTimeDuration = 20
-    let restTimeDuration = 300
+    let workTimeDuration = 10
+    let restTimeDuration = 5
     var timerDuration = 10
 
     private lazy var button: UIButton = {
@@ -29,14 +29,14 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let viewCenter = view.center
         let trackLayer = CAShapeLayer()
-        let circularPath = UIBezierPath(arcCenter: viewCenter, radius: 100, startAngle: -CGFloat.pi / 2, endAngle: 2 * CGFloat.pi, clockwise: true)
+        let circularPath = UIBezierPath(arcCenter: .zero, radius: 100, startAngle: 0, endAngle: 2 * CGFloat.pi, clockwise: true)
 
         trackLayer.path = circularPath.cgPath
         trackLayer.strokeColor = UIColor.lightGray.cgColor
         trackLayer.fillColor = UIColor.clear.cgColor
         trackLayer.lineWidth = 5
+        trackLayer.position = view.center
 
         view.layer.addSublayer(trackLayer)
 
@@ -45,6 +45,8 @@ class ViewController: UIViewController {
         shapeLayer.strokeEnd = 0
         shapeLayer.lineWidth = 8
         shapeLayer.lineCap = CAShapeLayerLineCap.round
+        shapeLayer.position = view.center
+        shapeLayer.transform = CATransform3DMakeRotation(-CGFloat.pi / 2, 0, 0, 1)
 
         view.layer.addSublayer(shapeLayer)
 
@@ -101,7 +103,7 @@ class ViewController: UIViewController {
 
     private func chooseAnimation() {
         basicAnimation.toValue = 1
-        basicAnimation.speed = 0.8
+        basicAnimation.speed = 1.0
         basicAnimation.fillMode = CAMediaTimingFillMode.forwards
         basicAnimation.isRemovedOnCompletion = false
         button.setImage(UIImage(named: "pauseIcon"), for: .normal)
