@@ -7,7 +7,7 @@ class ViewController: UIViewController {
     var timer = Timer()
     var isWorkTime = true
     var isStarted = false
-    let workTimeDuration = 1500
+    let workTimeDuration = 20
     let restTimeDuration = 300
     var timerDuration = 10
 
@@ -81,14 +81,19 @@ class ViewController: UIViewController {
     }
 
     private func secondsToMinutesAndSeconds(_ seconds: Int) -> String {
+
         let minutesInt = (seconds / 60) % 60
         let secondsInt = seconds % 60
-        var result = ""
+        var result = String(minutesInt) + ":"
 
-        if secondsInt == 0 {
-            result = String(minutesInt) + ":" + String(secondsInt) + "0"
+        if minutesInt < 10 {
+            result = "0" + String(minutesInt) + ":"
+        }
+
+        if secondsInt == 0 || secondsInt < 10 {
+            result += "0" + String(secondsInt)
         } else {
-            result = String(minutesInt) + ":" + String(secondsInt)
+            result += String(secondsInt)
         }
 
         return result
